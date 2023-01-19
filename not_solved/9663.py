@@ -1,51 +1,24 @@
-from copy import deepcopy
-
-done_position = []
-
-def set_false(chess_map, i, j):
-    _map = deepcopy(chess_map)
-    for idx in range(len(chess_map)):
-        _map[i][idx] = False
-        _map[idx][j] = False
-
-        if i-idx >= 0:
-            if j-idx >= 0:
-                _map[i-idx][j-idx] = False
-            if j+idx < len(chess_map):
-                _map[i-idx][j+idx] = False
-        if i+idx < len(chess_map): 
-            if j-idx >= 0:
-                _map[i+idx][j-idx] = False
-            if j+idx < len(chess_map):
-                _map[i+idx][j+idx] = False
-
-    return _map
-
-    
-def n_queen(N, n, chess_map, cnt, position):
+# 굳이 둘째 줄 이상을 더 탐색할 필요는 없음
+def n_queen(N, r, Q_pos):
+    global cnt
     for i in range(N):
-        for j in range(N):
-            if chess_map[i][j]:
-                position.append((i, j))
-                if n == 1:
-                    cnt += 1
-                    print(done_position)
-                    print(position)
-                    if not position in done_position:
-                        done_position.append(position)
-                    # print("!!")
-                else:
-                    # set false for impossible region
-                    new_map = set_false(chess_map, i, j)
-                    # print(new_map)
-                    cnt = n_queen(N, n-1, new_map, cnt, position)
+        is_possible = True
+        for r_q, c_q in Q_pos:
+            if (r_q - c_q) == r - i or (r_q + c_q) == r + i or r == r_q or i == c_q:
+                is_possible = False
+                break
                 
-                del position[-1]
+        if is_possible:
+            Q_pos += [(r, i)]
+            if r == N-1:
+                cnt += 1
+            else:
+                n_queen(N, r+1, Q_pos)
 
+            del Q_pos[-1]
 
-    return cnt
 
 N = int(input())
-chess_map = [[True for __ in range(N)] for _ in range(N)]
-possible_cnt = 0
-print(n_queen(N, N, chess_map, possible_cnt, []))
+cnt = 0
+n_queen(N, 0, [])
+print(cnt)
