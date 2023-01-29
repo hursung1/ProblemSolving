@@ -1,57 +1,43 @@
-def dijkstra(graph, n, stpt, dest):
-    ## Dijkstra Algorithm
-    f = lambda i: dist[i]
-    dist = [float("inf") for i in range(n)]
-    visited = []
-   
-    dist[stpt] = 0
-    while True:
-        if min(dist) == float("inf"):
-            print("INF")
-            break
+from queue import PriorityQueue
 
-        tmp = sorted(range(len(dist)), key=f)
-        '''
-        print(dist)
-        print(tmp)
-        print("======================")
-        '''
-        for index in tmp:
-            if index not in visited:
-                cur = index
-                visited.append(cur)
-                break
-        
-        if cur == dest:
-            if dist[cur] == float("inf"):
-                print("INF")
-            else:
-                print(dist[cur])
-            break
+v, e = input().split()
+v = int(v)
+e = int(e)
+s = int(input())
 
-        for tup in graph[cur]:
-            nextpt = tup[0] # dest
-            weight = tup[1] # weight
-            dist[nextpt] = min(dist[nextpt], dist[cur] + weight)
-            
-n, m = input().split()
-n = int(n)
-m = int(m)
-stpt = int(input()) - 1
+edge_info = {}
+for _ in range(e):
+    stpt, endpt, cost = input().split()
+    stpt = int(stpt)
+    endpt = int(endpt)
+    cost = int(cost)
+    if not stpt in edge_info.keys():
+        edge_info[stpt] = []
 
-## Graph: double array
-graph = {}
+    edge_info[stpt].append((endpt, cost))
 
-for i in range(n):
-    graph[i] = []
+cost = [float("inf") for _ in range(v)]
+current = s
+cost[current-1] = 0
+unvisited = list(range(1, v+1))
 
-for i in range(m):
-    start, end, weight = input().split()
-    start = int(start) - 1
-    end = int(end) - 1
-    weight = int(weight)
 
-    graph[start].append((end, weight))
+while unvisited:
+    cost_heap = PriorityQueue() # elem: (vertex, cost)
+    for v, c in enumerate(cost):
+        cost_heap.put((c, v+1))
 
-for i in range(n):
-    dijkstra(graph, n, stpt, i)
+    _, current = cost_heap.get()
+
+    print(unvisited)
+    print(current)
+    if current in edge_info.keys():
+        for v, c in edge_info[current]:
+            new_cost = cost[current-1] + c
+            if cost[v-1] > new_cost:
+                cost[v-1] = new_cost
+    
+    if current in unvisited:
+        unvisited.remove(current)
+
+print(cost)
